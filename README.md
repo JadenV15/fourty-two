@@ -16,4 +16,4 @@ python -m pip install flask
 flask run --debug
 ```
 
-<img src="https://github.com/JadenV15/fourty-two/blob/main/sample.png" height="200">
+<img src="https://github.com/JadenV15/fourty-two/blob/main/sample.png" style="display: block; margin: auto; width: 50%;">
