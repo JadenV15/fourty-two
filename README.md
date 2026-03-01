@@ -15,7 +15,10 @@ python -m pip install flask
 ```bat
 flask run --debug
 ```
-___
+Or use the launcher script for easy setup.
+
+## Image
+
 <p align="center">
   <img src="https://github.com/JadenV15/fourty-two/blob/main/sample.png" height="220">
 </p>
