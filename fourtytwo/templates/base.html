@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  {% block title %}
+    <title>Fourty-two Digits</title>
+  {% endblock title %}
+  
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/normalize.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/skeleton.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
+  <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='assets/favicon.png') }}">
+  
+  {% block customstyle %}
+    <style></style>
+  {% endblock customstyle %}
+  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2/dist/sweetalert2.min.css">
+  
+  <meta name="description" content="">
+  <meta name="theme-color" content="#fafafa">
+
+  <meta property="og:title" content="">
+  <meta property="og:type" content="">
+  <meta property="og:url" content="">
+  <meta property="og:image" content="">
+  <meta property="og:image:alt" content="">
+</head>
+
+<body>
+  {% block header %}
+  <header>
+    <img id="logo" src="{{ url_for('static', filename='assets/favicon.png') }}" height="60" />
+    <h3 id="title">Fourty-two digits</h3>
+  </header>
+  {% endblock header %}
+  
+  {% block navbar %}
+  <nav class="navbar">
+    <div class="navbar-item">
+	  <a class="navbar-link" href="#!">NAV1</a>
+	</div>
+	<div class="navbar-item">
+	  <a class="navbar-link" href="#!">NAV2</a>
+	</div>
+	<div class="navbar-item">
+	  <a class="navbar-link" href="#!">NAV3</a>
+	</div>
+  </nav>
+  {% endblock navbar %}
+  
+  {% block content %}
+  <main>
+    <div class="container">
+	  <h3 style="text-align: center;">No content</h3>
+	</div>
+  </main>
+  {% endblock content %}
+  
+  {% block footer %}
+  <footer>
+    <div class="foot">
+      <p>© 2026 Jaden Chuah</p>
+	</div>
+  </footer>
+  {% endblock footer %}
+  
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2"></script>
+  {% for msg in get_flashed_messages() %}
+  <script>
+document.addEventListener('DOMContentLoaded', function(e) {
+    Swal.fire({
+	    icon: 'error',
+		title: 'Invalid...',
+		text: {{ msg|tojson }},
+		showCloseButton: true
+	});
+});
+  </script>
+  {% endfor %}
+  
+  {% block customjs %}
+    <script></script>
+  {% endblock customjs %}
+  
+</body>
+
+</html>

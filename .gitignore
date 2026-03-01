@@ -1,0 +1,9 @@
+__pycache__/
+*.py[codz]
+*$py.class
+
+ignore/
+dist/
+build/
+
+.idea

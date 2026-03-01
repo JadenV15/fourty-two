@@ -1,0 +1,229 @@
+{% extends "base.html" %}
+
+{% block customstyle %}
+<style>
+.num-container {
+	margin: 25px 0px;
+	border: 1px solid gray;
+	border-radius: 6px;
+	padding: 20px;
+	overflow: auto;
+}
+
+.digits {
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+	gap: 11px;
+	box-sizing: border-box;
+	
+	overflow-x: auto; /* Seems to need overflow in child as well to avoid content touching border */
+	overflow-y: hidden;
+	overscroll-behavior: none;
+
+    -webkit-mask-image: linear-gradient(to right, transparent 0, black var(--left-mask-size, 0), black calc(100% - var(--right-mask-size, 0)), transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0, black var(--left-mask-size, 0), black calc(100% - var(--right-mask-size, 0)), transparent 100%);
+    --left-mask-size: 0px;
+    --right-mask-size: 0px;
+}
+.digits::-webkit-scrollbar {
+	width: auto;
+	height: 16px;
+    background: #eee;
+	border-radius: 10px;
+}
+.digits::-webkit-scrollbar-thumb:horizontal {
+	background-color: #888;
+	border-radius: 10px;
+}
+.digits::-webkit-scrollbar-thumb:horizontal:hover {
+	background-color: #555;
+}
+.digits::-webkit-scrollbar-button:horizontal:start:decrement,
+.digits::-webkit-scrollbar-button:horizontal:end:increment
+{
+	display: block;
+	width: 25px;
+	padding: 2px;
+	background-origin: content-box;
+    background-color: transparent;
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: auto 13px;
+}
+.digits::-webkit-scrollbar-button:horizontal:start:decrement {
+	background-image: url("{{ url_for('static', filename='assets/left_arrow.png') }}");
+}
+.digits::-webkit-scrollbar-button:horizontal:end:increment {
+	background-image: url("{{ url_for('static', filename='assets/right_arrow.png') }}");
+}
+.digits.is-left-overflowing {
+    --left-mask-size: 48px !important;
+}
+.digits.is-right-overflowing {
+    --right-mask-size: 48px !important;
+}
+
+.digit-sep {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.digit {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+}
+
+.digit-plus, .digit-minus {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 32px;
+	height: 32px;
+	font-size: 25px;
+	font-weight: 400;
+	color: black;
+	padding: 5px;
+	
+	-webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+.digit-plus {
+	color: green;
+}
+.digit-minus {
+	color: red;
+}
+
+.digit-value {
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+	
+	-webkit-user-select: text; /* Chrome/Safari */
+    -moz-user-select: text;    /* Firefox */
+    -ms-user-select: text;     /* IE/Edge */
+    user-select: text;         /* standard */
+}
+
+.digit-value > h4, .digit-sep > h4 {
+	display: inline-block;
+	font-weight: 600;
+}
+
+.digit-sep > h4 {
+	margin-bottom: 12px;
+}
+</style>
+{% endblock customstyle %}
+
+<!-- Todo: show the position of each digit (1st, 42nd) -->
+{% block content %}
+<main>
+  <div class="container">
+    <div class="container">
+        <h1>42 Digits - try changing a digit</h1>
+    </div>
+    <div class="num-container">
+      <div class="digits">
+      <!-- Demo -->
+	  {% for val in digits %}
+        <div class="digit">
+          <button class="button digit-plus" data-pos="{{ loop.index0 }}" data-action="+">+</button>
+          <div class="digit-value">
+            <h4>{{ val }}</h4>
+          </div>
+          <button class="button digit-minus" data-pos="{{ loop.index0 }}" data-action="-">-</button>
+		  
+		  <form id="digit-form" action="{{ url_for('fourtytwo.update') }}" method="POST" style="display: none;">
+		    <input type="hidden" name="pos" id="input-pos">
+			<input type="hidden" name="action" id="input-action">
+		  </form>
+	    </div>
+	    {% if loop.revindex0 % 3 == 0 and not loop.last %}
+        <div class="digit-sep">
+          <h4>,</h4>
+        </div>
+		{% endif %}
+	  {% endfor %}
+      </div>
+    </div>
+  </div>
+</main>
+{% endblock content %}
+  
+{% block customjs %}
+<script>
+(function() {
+    function $(id) {
+	    return document.getElementById(id);
+	}
+
+    function setHorizontalClasses(el) {
+        const isScrollable = el.scrollWidth > el.clientWidth;
+
+        // Guard: not scrollable
+        if (!isScrollable) {
+            el.classList.remove('is-left-overflowing', 'is-right-overflowing');
+            return;
+        }
+
+        // Check left/right overflow
+        const isScrolledToRight = el.scrollWidth <= el.clientWidth + el.scrollLeft + 1;
+        const isScrolledToLeft = el.scrollLeft === 0;
+
+        el.classList.toggle('is-left-overflowing', !isScrolledToLeft);
+        el.classList.toggle('is-right-overflowing', !isScrolledToRight);
+    }
+	
+	function controlScroll(el, margin='20px') {
+	    const isScrollable = el.scrollWidth > el.clientWidth;
+		const children = el.querySelectorAll(':scope > .digit');
+		
+		if (isScrollable) {
+		    children.forEach((el) => {
+			    el.style.marginBottom = margin;
+			});
+		} else {
+		    children.forEach((el) => {
+			    if (el.style.marginBottom === margin) {
+				    el.style.marginBottom = '0';
+				}
+			});
+		}
+	}
+
+    // Select all scrollable containers
+    const scrollContainers = document.querySelectorAll('.digits');
+
+    scrollContainers.forEach((el) => {
+        // Initialize classes
+        setHorizontalClasses(el);
+		controlScroll(el);
+		
+        // Update on scroll
+        el.addEventListener('scroll', () => setHorizontalClasses(el));
+		el.addEventListener('scroll', () => controlScroll(el));
+    });
+	
+	document.querySelectorAll('.digit-plus, .digit-minus').forEach((btn) => {
+	    btn.addEventListener('click', () => {
+		    const pos = btn.dataset.pos;
+			const action = btn.dataset.action;
+			
+			$('input-pos').value = pos;
+			$('input-action').value = action;
+			
+			$('digit-form').submit();
+		});
+	});
+	
+})();
+</script>
+{% endblock customjs %}
