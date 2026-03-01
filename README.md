@@ -15,5 +15,7 @@ python -m pip install flask
 ```bat
 flask run --debug
 ```
-
-<img src="https://github.com/JadenV15/fourty-two/blob/main/sample.png" style="display: block; margin: auto; width: 50%;">
+___
+<p align="center">
+  <img src="https://github.com/JadenV15/fourty-two/blob/main/sample.png" height="220">
+</p>
